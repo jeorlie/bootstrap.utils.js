@@ -5,6 +5,9 @@
  * Description: A collection of bunch of function and wrappers
  */
 var _alertDomkolek, _alertModalkolek, _confirmDomkolek,  _confirmModalkolek, _screenblockkolek;
+var kolek_ajax_config = {
+    endpoint: ''
+}
 
 function kolek_alert(obj){
     var t = $.extend({
@@ -58,7 +61,7 @@ function kolek_blockScreen(y) {
 
 function kolek_ajax(urlx, datax, funcx, showloading = true){
     $.ajax({
-      url: _instance_config['endpoint'] + urlx, cache: false, dataType: "json",
+      url: kolek_ajax_config['endpoint'] + urlx, cache: false, dataType: "json",
       headers: {"Content-type":"application/json;UTF-8"},
       data: JSON.stringify(datax), type: "POST", error: function (er) {
         kolek_alert({
