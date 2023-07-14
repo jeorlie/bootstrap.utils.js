@@ -1,2 +1,2 @@
 # kolek.js
-simple wrappre and function
+simple wrapper and function for bootstrap 5+
