@@ -1,156 +1,116 @@
 /**
  * Author: Jeorlie Edang
- * Date: 2023-07-14
- * File: kolek.js
- * Description: A collection of bunch of function and wrappers
+ * File: Strap.js
+ * Description: Personal bootstrap wrapper
+ * Dependencies: Jquery3+, Bootstrap5+
  */
-var _alertDomkolek, _alertModalkolek, _confirmDomkolek,  _confirmModalkolek, _screenblockkolek;
-var kolek_ajax_config = {
-    endpoint: ''
+var strap_alert_modal_instance;
+var strap_confirm_modal_instance;
+
+function strap_blockscreen(t){
+
 }
 
-function kolek_alert(obj){
-    var t = $.extend({
-        text: '',
-        callBack: function(){
-
-        },
-        title: 'Alert',
-        closeText: "Close",
-    }, obj);
-    
-
-    _alertDomkolek.find('.modal-title').html(t.title).end().find('.modal-body').html(t.text)
-    _alertDomkolek.find('.btn-close-trigger').html(t.closeText).off('click').unbind('click').on('click', function(){
-      setTimeout(function () {
-        t.callBack();
-      }, 250);
-    });
-
-    _alertModalkolek.modal('show');
-    console.log('open');
-}
-
-function kolek_confirm(y){
-    var t = $.extend({
-        title: "Confirm",
-        text: "",
-        noText: "No",
-        yesText: "Yes",
-        callBack: function () {
-  
-        }
-      }, y);
-
-      _confirmDomkolek.find('.modal-title').html(t.title).end().find('.modal-body').html(t.text)
-      _confirmDomkolek.find('.btn-close-trigger').html(t.noText).off('click').unbind('click');
-      _confirmDomkolek.find('.btn-yes-trigger').html(t.yesText).off('click').unbind('click').on('click', function () {
-      setTimeout(function () {
-        t.callBack();
-      }, 250);
-    });
-
-    _confirmModalkolek.modal('show');
-}
-
-function kolek_blockScreen(y) {
-    if (y) _screenblockkolek.show().find('input').focus();
-    else _screenblockkolek.fadeOut('fast');
-}
-
-
-function kolek_ajax(urlx, datax, funcx, showloading = true){
+function strap_ajax(xUrl, xData, xCallback){
     $.ajax({
-      url: kolek_ajax_config['endpoint'] + urlx, cache: false, dataType: "json",
-      headers: {"Content-type":"application/json;UTF-8"},
-      data: JSON.stringify(datax), type: "POST", error: function (er) {
-        kolek_alert({
-          title: "Request error!",
-          text: "There was an error parsing data from the server. Try again or check if you are connected to the internet."
-        });
-        console.dir(er);
-      }, beforeSend: function () {
-        if (showloading) kolek_blockScreen(true);
-      }, complete: function () {
-        if (showloading) {
-            kolek_blockScreen(false);
+        url: xUrl, data: xData, type:'POST', dataType: 'json', cache: false,
+        beforeSend: function(){ strap_blockscreen(true); },
+        complete: function() { strap_blockscreen(false);},
+        error: function(er) { console.dir(er); strap_alert({message: 'Unknown error has occured. Try again'});},
+        success: function(ret){
+            if(ret.success == false) {
+                strap_alert({message: ret.message});
+            }
+            xCallback(ret);
         }
-      }, success: function (res) {
-          if (res.success == false || res.success == "false") {             
-            kolek_alert({
-                  title: res.title || "Error!",
-                  text: res.message
-              });
-          } else {
-              funcx(res);
-          }
-        
-      }
+    })
+}
+
+function strap_alert(y){
+    var t = $.extend({
+        title: 'Alert',
+        message: '',
+        callBack: function(){}
+    }, y);
+    var obj = $("#appl-alert-modal-bs");
+    obj.find('.modal-title').html(t.title).end().find('.modal-body p').html(t.message);
+    strap_alert_modal_instance.show();
+    obj.find('.btn-secondary').off('click').unbind('click').on('click', function(){
+        setTimeout(function(){
+            t.callBack();
+        }, 300);
     });
-  }
+}
 
+function strap_confirm(y){
+    var t = $.extend({
+        title: 'Confirm',
+        message: '',
+        callBack: function(){}
+    }, y);
+    var obj = $("#appl-confirm-modal-bs");
+    obj.find('.modal-title').html(t.title).end().find('.modal-body p').html(t.message);
+    strap_confirm_modal_instance.show();
 
-// load defaults
-var xfalert = `
-      <div class="modal fade" id="kolek-dom-alert-modal-box" tabindex="-1">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title"></h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    obj.find('.modal-btn-yes').off('click').unbind('click').click(function(){
+        setTimeout(function(){
+            t.callBack();
+        }, 300);
+    });
+
+}
+
+window.addEventListener('load', function(){
+    var str = `
+        
+        <div class="modal" id="appl-confirm-modal-bs" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modal title</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Modal body text goes here.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No/Cancel</button>
+                    <button type="button" class="btn btn-primary modal-btn-yes" data-bs-dismiss="modal">Yes</button>
+                </div>
+                </div>
             </div>
-            <div class="modal-body">
-              
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary btn-close-trigger" data-bs-dismiss="modal">Close</button>
-            </div>
-          </div>
         </div>
-      </div>
- `;
-
-var xfconfirm = `
-      <div class="modal fade" id="kolek-dom-confirm-modal-box" tabindex="-1">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title"></h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal" id="appl-alert-modal-bs" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modal title</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Modal body text goes here.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+                </div>
             </div>
-            <div class="modal-body">
-              
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-primary btn-close-trigger" data-bs-dismiss="modal" style="min-width:80px">No</button>
-              <button type="button" class="btn btn-secondary btn-yes-trigger" data-bs-dismiss="modal">Yes</button>
-            </div>
-          </div>
         </div>
-      </div>
-`;
+    `;
 
-var xfscreenblocker = `
-      <div id="kolek-dom-app-screen-blocker" style="display:none;position:fixed;top:0;left:0;width:100%;height:100vh;z-index:99999 !important;background:rgba(0,0,0,0.9);">
-        <p style="text-align:center;padding-top:0.5em; color:#fff">
-          Please wait...
-        </p>
-        <input type="text" readonly style="position:absolute;bottom:1px;right:1px;width:1px;height:1px;outline:none;background:none;padding:0;">
-      </div>
-`;
+    $("body").append(str);
+    setTimeout(function(){
+        var options = {
+            backdrop: 'static',
+            keyboard: false   
+        };        
+        strap_alert_modal_instance = new bootstrap.Modal(document.getElementById('appl-alert-modal-bs'), options);
+        strap_confirm_modal_instance = new bootstrap.Modal(document.getElementById('appl-confirm-modal-bs'), options);
+        
+    },250);
 
+    setTimeout(function(){
+        $(".appl-loader").hide();
+    }, 900);
 
-setTimeout(function () {    
-    $("body").append(xfalert);
-    $("body").append(xfconfirm);
-    $("body").append(xfscreenblocker);
-}, 150);
-
-setTimeout(function () {
-    _alertDomkolek = $("#kolek-dom-alert-modal-box");
-    _alertModalkolek = _alertDomkolek.modal({ backdrop: 'static', keyboard: false });
-    _confirmDomkolek = $("#kolek-dom-confirm-modal-box");
-    _confirmModalkolek = _confirmDomkolek.modal({ backdrop: 'static', keyboard: false });
-    _screenblockkolek = $("#kolek-dom-app-screen-blocker");
-    console.log('kolek-dom initialized.');
-}, 200);
+});
