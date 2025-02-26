@@ -2,17 +2,23 @@
  * author: Jeorlie Edang
  * dep: bootstrap-4.6.2 / jquery 3.5+
  */
-
+var boot_alert_interval, boot_alert_interval_loop;
 function boot_alert(k){
+    var timerTick = 0;
     var t = $.extend({
         title: 'Alert',
         message: '',
-        callback: null
+        callback: null,
+        timer: 0
     },k);
+    timerTick = parseInt(t.timer);
+    boot_alert_interval_loop = 0;
     var ele = $("#modal-alert-box");
+    var btnSecond = ele.find('.modal-footer .btn-secondary');
+    btnSecond.attr("disabled", false);
     ele.find('.modal-body').empty().append(t.message);
     ele.find('.modal-title').text(t.title);
-    ele.find('.modal-footer .btn-secondary').unbind('click').off('click').on('click', function(){
+    btnSecond.unbind('click').off('click').on('click', function(){
         ele.modal('hide');
         if(typeof t.callback == "function"){
             setTimeout(function(){
@@ -21,6 +27,18 @@ function boot_alert(k){
         }
     });
     ele.modal('show');
+    if(timerTick > 0) {
+        btnSecond.attr("disabled", true).text("Wait ("+ timerTick+")");
+        boot_alert_interval = setInterval(function(){
+            btnSecond.text("Wait (" + (timerTick - boot_alert_interval_loop) + ")");
+            boot_alert_interval_loop++;
+            if(boot_alert_interval_loop > timerTick) {
+                clearInterval(boot_alert_interval);
+                btnSecond.text("Close").attr("disabled", false);
+            }
+        }, 1000);
+        
+    }
 }
 
 function boot_ajax(turl, tdata, tcallback){
@@ -41,7 +59,10 @@ function boot_ajax(turl, tdata, tcallback){
             boot_block_screen(false);
         },
         success: function(ret){
-
+            if(!ret.success) {
+                boot_alert({message: ret.message});
+            }
+            tcallback(ret);
         }
     });
 }
@@ -52,7 +73,7 @@ function boot_block_screen(tBool, tString){
     else ele.fadeOut('fast');
 }
 
-function boot_alert(k){
+function boot_confirm(k){
     var t = $.extend({
         title: 'Confirm',
         message: '',
@@ -94,8 +115,8 @@ window.addEventListener("load", function(){
             </div>  
 
             <div class="modal" id="modal-alert-box" tabindex="-1">
-                <div class="modal-dialog">
-                    <div class="modal-content">
+                <div class="modal-dialog modal-dialog-centered ">
+                    <div class="modal-content ">
                     <div class="modal-header">
                         <h5 class="modal-title">Modal title</h5>
                     </div>
@@ -110,7 +131,7 @@ window.addEventListener("load", function(){
             </div>
 
             <div class="modal" id="modal-confirm-box" tabindex="-1">
-                <div class="modal-dialog">
+                <div class="modal-dialog modal-dialog-centered ">
                     <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Modal title</h5>
