@@ -59,7 +59,7 @@ function boot_charming(tTarget, config = {}){
 
     this.init = function(){
         target.css({'position': 'fixed', top: "-100%", left:0, width: "100%", height: "100vh", "z-index": 500,
-            background: "#000", display: "block"
+            background: "#000", display: "block", "overflow-x" : "auto", "padding-bottom":"2em"
         });
         if(conf.addBackButton){
             var str = `
