@@ -146,8 +146,7 @@ function do_charming(pTarget, pConfig) {
         };
         target.css(cssOptions).prepend(str);
 
-        if(t.buttons.length > 0){
-            console.log('found buttons');
+        if(t.buttons.length > 0){            
             var btn;
             var str = ''
             for(i in t.buttons) {
@@ -182,7 +181,6 @@ function do_charming(pTarget, pConfig) {
     }
 
     this.hide = function(){
-        console.log("close event");
         target.find('.boot-charming-back-button').click();
     }
 
@@ -243,6 +241,7 @@ window.addEventListener("load", function(){
     SYSTEM_MODAL_CONFIRM_INSTANCE = $(".modal-confirm-box");
     SYSTEM_MODAL_ALERT_INSTANCE.modal(options);
     SYSTEM_MODAL_CONFIRM_INSTANCE.modal(options);
+
 
 
 });
