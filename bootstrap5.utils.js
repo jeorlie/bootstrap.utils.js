@@ -125,7 +125,7 @@ function do_charming(pTarget, pConfig) {
         },
         buttons: [],
         backgroundColor: '#fff',
-        zIndex: 100,
+        zIndex: 500,
     }, pConfig);
 
     this.init = function(){
@@ -138,6 +138,7 @@ function do_charming(pTarget, pConfig) {
         `;
         var cssOptions = {
             'top': '-110%', 
+            'left' : 0,
             'position': 'fixed',
             'height' : '100vh',
             'width'     : '100%',
@@ -163,11 +164,9 @@ function do_charming(pTarget, pConfig) {
         }
 
         target.on('click', '.boot-charming-back-button', function(){
-            t.onClose();
-            target.animate({
-                'top': '-110%'
-            }, 300);
+            selfie.hide();
         });
+
         target.removeClass("d-none");
     }
     this.parent = function(){
@@ -181,8 +180,13 @@ function do_charming(pTarget, pConfig) {
         }, 300);
     }
 
-    this.hide = function(){
-        target.find('.boot-charming-back-button').click();
+    this.hide = function(){        
+        target.animate({
+            'top': '-110%'
+        }, 300);
+        setTimeout(function(){
+            t.onClose();
+        }, 200);
     }
 
 }
@@ -246,4 +250,3 @@ window.addEventListener("load", function(){
 
 
 });
-
