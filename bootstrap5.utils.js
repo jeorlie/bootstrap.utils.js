@@ -168,6 +168,7 @@ function do_charming(pTarget, pConfig) {
                 'top': '-110%'
             }, 300);
         });
+        target.removeClass("d-none");
     }
     this.parent = function(){
         return target;
@@ -245,3 +246,4 @@ window.addEventListener("load", function(){
 
 
 });
+
